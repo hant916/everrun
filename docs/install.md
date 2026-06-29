@@ -1,113 +1,89 @@
-# Installation & Configuration
+# Install
 
-## Prerequisites
-
-| Dependency | Minimum | Check |
-|-----------|---------|-------|
-| Python | 3.11+ | `python --version` |
-| Git | 2.30+ | `git --version` |
-| Backend CLI | — | `codex --version` / `claude --version` / `opencode --version` |
-
-## Install
-
-### From wheel
+## Install the wheel
 
 ```bash
 pip install everrun-0.1.0-py3-none-any.whl
 ```
 
-Verify:
+Confirm the installed version:
 
 ```bash
-everrun --version
+everrun version
 ```
 
-### From source (development)
+Requirements:
+
+- Python 3.9+
+- Git on PATH
+- At least one external coding agent CLI on PATH
+
+## Coding agents
+
+EverRun does not include a model runtime.
+It orchestrates external coding agent CLIs.
+
+You need at least one:
+
+- OpenCode
+- Codex
+- Claude Code
+
+One is enough to start.
+Multiple agents improve fallback and independent review.
+
+EverRun detects which agent CLIs are on your PATH and configures the project
+around what it finds. It never installs these tools for you.
+
+### Readiness model
+
+```text
+0 coding agents  = BLOCKED
+1 coding agent   = READY, single-agent mode
+2+ coding agents = READY, multi-agent mode
+```
+
+A single coding agent is a valid READY state, not a degraded one.
+
+### Recommended first agent
+
+If you have no coding agent yet, OpenCode is the recommended low-cost first-run
+path:
+
+```text
+OpenCode + deepseek/deepseek-v4-flash
+```
+
+### Installing a coding agent
+
+OpenCode:
 
 ```bash
-git clone <private-repo-url> everrun
-cd everrun
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -e .
+npm install -g opencode-ai
 ```
 
-## Backend Setup
-
-EverRun supports three coding backends. At least one must be available on PATH.
-
-### Codex
+Codex:
 
 ```bash
-pip install openai-codex
-codex --version
+npm install -g @openai/codex
+codex login
 ```
 
-### Claude / OpenCode
-
-Follow the respective CLI installation guides. Both must be available as shell commands:
+Claude Code:
 
 ```bash
-claude --version
-opencode --version
+npm install -g @anthropic-ai/claude-code
+claude login
 ```
 
-## Initialization
+After installing one agent, run:
 
 ```bash
 everrun init
 ```
 
-Creates `.everrun/` with default configuration:
+## Next
 
-- `role-assignment.json` — backend chain order
-- `impl-pack.system.txt` — pack generation prompt
-- `validation.env` — default validation commands
-
-### Configure backend chain
-
-Edit `.everrun/role-assignment.json`:
-
-```json
-{
-  "coder":  { "chain": ["codex", "opencode", "claude"] },
-  "planner": { "chain": ["claude", "codex", "opencode"] },
-  "judge":  { "chain": ["codex", "claude", "opencode"] }
-}
-```
-
-Order matters — the first available backend is used, others serve as fallback.
-
-### Configure validation
-
-Edit `.everrun/validation.env`:
-
-```bash
-PYTEST_ARGS="tests -q"
-```
-
-Add any project-specific validation commands.
-
-## Running
-
-```bash
-everrun todo          # select/define the next task
-everrun run           # start the bounded pack loop
-```
-
-EverRun will:
-
-1. Generate or load an implementation pack from the task
-2. Launch the coder to implement changes
-3. Run validation commands
-4. Invoke the planner to review and decide
-5. Accept, retry, or escalate to human review
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `EVERRUN_MAX_ITERATIONS` | 5 | Max coder executions per pack |
-| `EVERRUN_TARGET_ROOT` | `.` | Workspace root |
-| `PYTEST_ARGS` | `tests -q` | Default validation command |
-| `DEBUG` | `false` | Enable verbose backend error output |
+- [getting-started.md](getting-started.md) — the fast path
+- [init.md](init.md) — what `everrun init` does
+- [troubleshooting.md](troubleshooting.md) — PATH and agent detection issues

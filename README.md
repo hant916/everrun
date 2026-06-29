@@ -1,47 +1,44 @@
 # EverRun
 
-**Bounded coding-agent runner.** Lets AI coding agents (Codex, Claude, OpenCode) execute implementation packs continuously with deterministic safety gates.
-
-## Install
+Bounded coding-agent runner. AI writes code, the system applies safety gates.
 
 ```bash
 pip install everrun-0.1.0-py3-none-any.whl
+cd your-project
+everrun init
+everrun demo
 ```
 
-Requirements: Python 3.11+, Git, and at least one supported backend CLI (codex / claude / opencode).
-
-## Quick Start
+Then start the real loop:
 
 ```bash
-everrun init          # first run only — creates .everrun/
-everrun todo          # write or select the next task
-everrun run           # execute the bounded pack loop
+everrun pack-shape start
+everrun run
+everrun report
 ```
 
-## How It Works
+---
 
-```
-impl pack -> coder -> validation -> planner -> judge -> accept / retry / human_review
-                    |
-            controller (hard gates)
-```
+## Next
 
-- **Coder** — writes files, runs commands
-- **Controller** — checks hard gates (scope, forbidden paths, secrets, validation)
-- **Planner** — semantic review, decide accept/retry/human_review
-- **Judge** — optional deep review for high-risk changes
-
-## Key Principles
-
-- **Dirty workspace is not a hard bound.** Forbidden to commit != forbidden to exist. Only secrets block.
-- **Recoverable runtime failures don't terminate.** Backend timeouts, auth errors, planner unavailability route to retry/fallback, not HUMAN_REVIEW.
-- **Hard gates are deterministic.** Scope, forbidden paths, secrets — no LLM judgment on safety boundaries.
-- **Every ACCEPT requires validation to pass and scope to be clean.**
+- **[Getting Started](docs/getting-started.md)** — the fast path to your first run
+- **[Release Onboarding](docs/release/v0.1.0-onboarding.md)** — verification checklist and canonical docs
 
 ## Docs
 
-- [Installation & Configuration](docs/install.md)
+Start here:
 
-## License
+- [Getting Started](docs/getting-started.md)
+- [Install](docs/install.md) · [Init](docs/init.md) · [Shape](docs/shape.md) · [Run](docs/run.md) · [Habit Loop](docs/habit-loop.md)
+- [Configuration](docs/configuration.md) · [Troubleshooting](docs/troubleshooting.md)
 
-Proprietary. All rights reserved.
+Reference:
+
+- [Constitution](docs/constitution.md) · [Doctrine](docs/doctrine.md)
+- [Runtime Governance](docs/runtime-governance.md)
+- [Pack Shape](docs/pack-shape.md)
+- [Release Evidence](docs/release-evidence/README.md)
+
+---
+
+One coding agent is enough to start. EverRun orchestrates external CLIs (OpenCode, Codex, Claude Code) — it does not include a model runtime.
