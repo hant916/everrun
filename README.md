@@ -34,6 +34,8 @@ Start here:
 
 Reference:
 
+- [Impl Pack Schema](docs/impl-pack-schema.md) — the full JSON contract
+- [Example Pack](examples/example-greeting-cli.todo.json) — a complete, copy-pasteable starting point
 - [Constitution](docs/constitution.md) · [Doctrine](docs/doctrine.md)
 - [Runtime Governance](docs/runtime-governance.md)
 - [Pack Shape](docs/pack-shape.md)
