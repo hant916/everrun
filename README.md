@@ -2,6 +2,8 @@
 
 Bounded coding-agent runner. AI writes code, the system applies safety gates.
 
+**[everrun.ailuros.io](https://everrun.ailuros.io)**
+
 ```bash
 pip install everrun-0.1.0-py3-none-any.whl
 cd your-project
@@ -16,6 +18,20 @@ everrun pack-shape start
 everrun run
 everrun report
 ```
+
+---
+
+## Impl Pack
+
+An **Impl Pack** is the contract EverRun executes. It tells the coder what to build,
+the controller what to guard, and the planner what to verify.
+
+Write one as a `.todo.json` file. Copy the example and replace the fields:
+
+- **[Impl Pack Schema](docs/impl-pack-schema.md)** — every field, type, and default
+- **[Example Pack](examples/example-greeting-cli.todo.json)** — a complete, ready-to-customize template
+
+Or generate one interactively with `everrun pack-shape start`.
 
 ---
 
