@@ -5,19 +5,26 @@
     "title": "CLI greeting tool"
   },
   "human_pressure": {
-    "one_screen_brief": "Build a small CLI tool that greets users. It should accept a --name flag, default to 'World', and print 'Hello, <name>!' to stdout. Must include a test.",
+    "one_screen_brief": "Build a small CLI tool that greets users. It should accept a --name flag, default to 'World', and print 'Hello, <name>!' to stdout. The script must be importable as a module with a pure greet(name) function. Must include a test.",
+    "goal": "Produce a runnable, importable, tested CLI greeting script.",
+    "do_not_misread": [
+      "This is a CLI entry-point script, not a library package.",
+      "The greet() function must NOT print itself — __main__ handles I/O."
+    ],
     "non_goals": [
       "No config file support",
       "No translation / i18n",
-      "No colored output"
+      "No colored output",
+      "No argument parsing beyond --name"
     ],
     "red_lines": [
       "Do not touch README.md or any existing code",
-      "Do not add third-party dependencies"
+      "Do not add third-party dependencies",
+      "Use only the Python standard library"
     ]
   },
   "machine_core": {
-    "goal": "Create a CLI script at src/greet.py with a --name flag (default 'World') and a greet() function. Include a test at tests/test_greet.py.",
+    "goal": "Create a CLI script at src/greet.py with a --name flag (default 'World') and a pure greet(name: str) -> str function. Include a test at tests/test_greet.py covering default, named, and edge cases.",
     "files": {
       "allow": ["src/", "tests/"],
       "create": ["src/greet.py", "tests/test_greet.py"],
@@ -26,26 +33,44 @@
     "validate": [
       "python src/greet.py --name Alice",
       "python -m pytest tests/test_greet.py -q",
-      "python src/greet.py"
+      "python src/greet.py",
+      "python -c \"from src.greet import greet; assert greet('Bob') == 'Hello, Bob!'\""
     ],
     "acceptance": [
-      "src/greet.py exists and is importable",
-      "tests/test_greet.py exists and passes",
+      "src/greet.py exists and is importable as a module",
+      "tests/test_greet.py exists and passes all cases",
       "python src/greet.py prints 'Hello, World!'",
-      "python src/greet.py --name Alice prints 'Hello, Alice!'"
+      "python src/greet.py --name Alice prints 'Hello, Alice!'",
+      "greet('Bob') returns 'Hello, Bob!' (no side effects)"
+    ],
+    "red_lines": [
+      "src/greet.py must not import third-party packages",
+      "greet() must not call print() or write to stdout"
+    ],
+    "failure_semantics": [
+      "Validation failed",
+      "Forbidden file touched",
+      "Scope drift"
+    ],
+    "invariants": [
+      "greet(name) is a pure function",
+      "I/O only happens in __main__ block"
     ]
   },
   "judge": {
     "must_check": [
-      "src/greet.py exists with a greet(name) function",
-      "tests/test_greet.py covers default and named greeting",
-      "Validation commands exit 0"
+      "src/greet.py exists with a greet(name) -> str function",
+      "tests/test_greet.py covers default, named, and edge-case inputs",
+      "All validation commands exit 0",
+      "greet() does not call print()"
     ],
     "reject_if": [
       "Validation failed",
       "Forbidden files changed (src/main.py, config/)",
       "Third-party dependency added",
-      "Existing code modified"
+      "Existing code modified",
+      "greet() calls print() or writes to stdout",
+      "Changed files exceed allowed scope"
     ]
   },
   "runtime_governance": {
@@ -53,5 +78,8 @@
     "accept_checkpoint": {
       "enabled": true
     }
+  },
+  "execution_policy": {
+    "max_attempts": 3
   }
 }
