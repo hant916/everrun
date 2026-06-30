@@ -1,17 +1,64 @@
 # EverRun
 
-Bounded coding-agent runner. AI writes code, the system applies safety gates.
+**A bounded run, not a free-for-all.**
 
-**[everrun.ailuros.io](https://everrun.ailuros.io)**
+Coding agents can write code.
+EverRun decides whether the run can continue.
+
+Scope. Validation. Judgment. Evidence.
+
+[everrun.ailuros.io](https://everrun.ailuros.io)
+
+---
+
+## What EverRun does
+
+EverRun runs coding agents inside a bounded task.
+
+It takes an **Impl Pack**, lets a coder implement it, runs validation, then asks a planner to decide:
+
+```text
+ACCEPT · RETRY · SHRINK · STOP · HUMAN_REVIEW
+```
+
+No validation, no accept.
+
+---
+
+## Run flow
+
+```mermaid
+flowchart LR
+  A[Impl Pack] --> B[Coder]
+  B --> C[Validation]
+  C --> D[Planner]
+  D --> E{Decision}
+  E -->|ACCEPT| F[Report]
+  E -->|RETRY| B
+  E -->|SHRINK| A
+  E -->|STOP| F
+  E -->|HUMAN_REVIEW| F
+```
+
+---
+
+## Quick start
+
+Install EverRun:
 
 ```bash
 pip install everrun-0.1.0-py3-none-any.whl
+```
+
+Initialize your project:
+
+```bash
 cd your-project
 everrun init
 everrun demo
 ```
 
-Then start the real loop:
+Run a real task:
 
 ```bash
 everrun pack-shape start
@@ -21,42 +68,61 @@ everrun report
 
 ---
 
-## Impl Pack
+## What you get
 
-An **Impl Pack** is the contract EverRun executes. It tells the coder what to build,
-the controller what to guard, and the planner what to verify.
+Code changed.
+Validation checked.
+Decision made.
+Evidence written.
 
-Write one as a `.todo.json` file. Copy the example and replace the fields:
-
-- **[Impl Pack Schema](docs/impl-pack-schema.md)** — every field, type, and default
-- **[Example Pack](examples/example-greeting-cli.todo.json)** — a complete, ready-to-customize template
-
-Or generate one interactively with `everrun pack-shape start`.
+| Output         | Meaning                                 |
+| -------------- | --------------------------------------- |
+| Changed files  | exactly what was touched                |
+| Validation     | tests · typecheck · lint                |
+| Decision       | accept · retry · shrink · stop · review |
+| Scope judgment | stayed within bounds?                   |
+| Report         | full run on disk                        |
 
 ---
 
-## Next
+## What EverRun is not
 
-- **[Getting Started](docs/getting-started.md)** — the fast path to your first run
-- **[Release Onboarding](docs/release/v0.1.0-onboarding.md)** — verification checklist and canonical docs
+EverRun is not a general agent platform.
+
+It is not:
+
+* an infinite self-healing loop
+* a background daemon
+* a multi-agent playground
+* a replacement for engineering judgment
+
+EverRun runs one scoped task, checks the result, and forces a decision.
+
+That narrowness is the product.
+
+---
 
 ## Docs
 
 Start here:
 
-- [Getting Started](docs/getting-started.md)
-- [Install](docs/install.md) · [Init](docs/init.md) · [Shape](docs/shape.md) · [Run](docs/run.md) · [Habit Loop](docs/habit-loop.md)
-- [Configuration](docs/configuration.md) · [Troubleshooting](docs/troubleshooting.md)
+* [Getting Started](docs/getting-started.md)
+* [Install](docs/install.md)
+* [Shape](docs/shape.md)
+* [Run](docs/run.md)
 
 Reference:
 
-- [Impl Pack Schema](docs/impl-pack-schema.md) — the full JSON contract
-- [Example Pack](examples/example-greeting-cli.todo.json) — a complete, copy-pasteable starting point
-- [Constitution](docs/constitution.md) · [Doctrine](docs/doctrine.md)
-- [Runtime Governance](docs/runtime-governance.md)
-- [Pack Shape](docs/pack-shape.md)
-- [Release Evidence](docs/release-evidence/README.md)
+* [Configuration](docs/configuration.md)
+* [Troubleshooting](docs/troubleshooting.md)
+* [Impl Pack Schema](docs/impl-pack-schema.md)
+* [Example Pack](examples/example-greeting-cli.todo.json)
 
 ---
 
-One coding agent is enough to start. EverRun orchestrates external CLIs (OpenCode, Codex, Claude Code) — it does not include a model runtime.
+## Status
+
+Private Alpha RC.
+
+EverRun orchestrates external coding CLIs such as OpenCode, Codex, and Claude Code.
+It does not include a model runtime.
