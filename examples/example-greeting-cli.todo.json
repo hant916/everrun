@@ -1,0 +1,57 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "id": "0001.cli-greeting",
+    "title": "CLI greeting tool"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Build a small CLI tool that greets users. It should accept a --name flag, default to 'World', and print 'Hello, <name>!' to stdout. Must include a test.",
+    "non_goals": [
+      "No config file support",
+      "No translation / i18n",
+      "No colored output"
+    ],
+    "red_lines": [
+      "Do not touch README.md or any existing code",
+      "Do not add third-party dependencies"
+    ]
+  },
+  "machine_core": {
+    "goal": "Create a CLI script at src/greet.py with a --name flag (default 'World') and a greet() function. Include a test at tests/test_greet.py.",
+    "files": {
+      "allow": ["src/", "tests/"],
+      "create": ["src/greet.py", "tests/test_greet.py"],
+      "forbid": ["src/main.py", "config/"]
+    },
+    "validate": [
+      "python src/greet.py --name Alice",
+      "python -m pytest tests/test_greet.py -q",
+      "python src/greet.py"
+    ],
+    "acceptance": [
+      "src/greet.py exists and is importable",
+      "tests/test_greet.py exists and passes",
+      "python src/greet.py prints 'Hello, World!'",
+      "python src/greet.py --name Alice prints 'Hello, Alice!'"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "src/greet.py exists with a greet(name) function",
+      "tests/test_greet.py covers default and named greeting",
+      "Validation commands exit 0"
+    ],
+    "reject_if": [
+      "Validation failed",
+      "Forbidden files changed (src/main.py, config/)",
+      "Third-party dependency added",
+      "Existing code modified"
+    ]
+  },
+  "runtime_governance": {
+    "max_coder_executions_per_pack": 3,
+    "accept_checkpoint": {
+      "enabled": true
+    }
+  }
+}
