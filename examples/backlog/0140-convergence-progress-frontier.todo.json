@@ -1,0 +1,74 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "id": "0140.convergence-progress-frontier",
+    "title": "Add Cross-Round Progress and Frontier State",
+    "type": "validation_infrastructure"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Add explicit cross-round convergence state on top of normalized validation evidence. The system must distinguish FAIL->FAIL with measurable forward motion from true stagnation or regression. Introduce a conservative Progress/Frontier model that compares validation trajectories across rounds and records what changed, without deciding the next action yet.",
+    "goal": "Make EverRun able to answer: are we closer to acceptance than the previous round, unchanged, regressed, or unable to tell?",
+    "non_goals": [
+      "Do not add LLM policy or autonomous replanning in this pack.",
+      "Do not redefine test truth or acceptance criteria.",
+      "Do not require every validator to expose step-level detail; support partial evidence."
+    ],
+    "red_lines": [
+      "Progress must be evidence-derived, not model opinion.",
+      "Unknown progress must remain UNKNOWN rather than being forced into progress/stuck.",
+      "A higher raw pass count must not hide a newly introduced regression in previously passing requirements."
+    ]
+  },
+  "machine_core": {
+    "goal": "Implement persistent per-round convergence state with progress classification and frontier representation, plus deterministic tests for progress, stuck, regression, and unknown cases.",
+    "files": {
+      "allow": ["agent/**", "tests/**", "docs/**"],
+      "create": ["docs/convergence/progress-frontier.md"],
+      "forbid": []
+    },
+    "validate": [
+      "pytest -q tests/test_loop.py tests/test_source_context.py",
+      "python -m compileall -q agent"
+    ],
+    "acceptance": [
+      "Persist round index and comparable validation snapshots across at least two rounds.",
+      "Classify cross-round state as PROGRESS, STUCK, REGRESSED, PASS, or UNKNOWN using deterministic evidence.",
+      "Represent frontier advancement when ordered/step-level evidence is available, while degrading gracefully to requirement/test-level progress when it is not.",
+      "Track resolved failures and newly introduced failures separately.",
+      "Tests cover FAIL-at-step-2 -> FAIL-at-step-4 as PROGRESS, identical failure as STUCK, loss of a previously passing invariant as REGRESSED, and insufficient evidence as UNKNOWN.",
+      "Expose the convergence snapshot in a form that a later controller can consume without reparsing logs."
+    ],
+    "failure_semantics": [
+      "FALSE_PROGRESS",
+      "REGRESSION_HIDDEN_BY_PASS_COUNT",
+      "UNKNOWN_FORCED_TO_DECISION",
+      "CROSS_ROUND_STATE_LOST"
+    ],
+    "invariants": [
+      "Progress classification never changes the underlying validator verdict.",
+      "Previously passing critical invariants are tracked so regressions are observable.",
+      "The representation remains useful when only requirement-level outcomes are available."
+    ],
+    "evidence_matrix_required": true,
+    "type": "validation_infrastructure"
+  },
+  "judge": {
+    "must_check": [
+      "FAIL->FAIL forward movement is distinguishable from repeated identical failure.",
+      "Regression is first-class and cannot be masked by aggregate progress.",
+      "UNKNOWN remains a valid conservative state."
+    ],
+    "reject_if": [
+      "Progress depends on free-form LLM judgment.",
+      "The implementation requires all validators to emit identical detailed traces.",
+      "Regression information is discarded."
+    ],
+    "required": true
+  },
+  "runtime_governance": {
+    "max_coder_executions_per_pack": 4,
+    "accept_checkpoint": {"enabled": true},
+    "validation_debt_classification": {"enabled": true}
+  },
+  "execution_policy": {"max_attempts": 3}
+}
