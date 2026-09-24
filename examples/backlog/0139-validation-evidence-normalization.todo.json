@@ -1,0 +1,73 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "id": "0139.validation-evidence-normalization",
+    "title": "Normalize Validation Evidence for Convergence",
+    "type": "validation_infrastructure"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Turn currently scattered validator, Playwright, diagnostics, source-context, console/network, and requirement-level results into a stable ValidationEvidence model that can be compared across repair rounds. Reuse existing evidence producers wherever possible; this pack is about normalization and preservation, not rewriting validators.",
+    "goal": "Make validation output machine-readable enough to support progress/frontier calculation and next-action decisions.",
+    "non_goals": [
+      "Do not add a convergence controller yet.",
+      "Do not replace existing Playwright/validator execution.",
+      "Do not invent evidence that the current runtime cannot observe."
+    ],
+    "red_lines": [
+      "Preserve current PASS/FAIL/NOT_RUN semantics.",
+      "Existing validator behavior must remain backward compatible.",
+      "Missing observations must be explicit null/unknown values, never guessed."
+    ]
+  },
+  "machine_core": {
+    "goal": "Introduce a normalized ValidationEvidence representation and adapters from existing validation/diagnostic outputs, with regression tests.",
+    "files": {
+      "allow": ["agent/**", "tests/**", "docs/**"],
+      "create": ["docs/convergence/validation-evidence.md"],
+      "forbid": []
+    },
+    "validate": [
+      "pytest -q tests/test_source_context.py tests/test_loop.py",
+      "python -m compileall -q agent"
+    ],
+    "acceptance": [
+      "ValidationEvidence can represent requirement/test identity, outcome, passed steps when available, failed step when available, expected/observed values, diagnostics, and source/evidence references without fabricating unavailable fields.",
+      "Existing PASS, FAIL, and NOT_RUN aggregation semantics remain unchanged.",
+      "Adapters preserve current validator evidence while exposing a stable cross-round representation.",
+      "At least one test covers rich evidence and one covers sparse evidence where only FAIL plus limited diagnostics are available.",
+      "Documentation states exactly which evidence fields ARC/Playwright currently provides and which remain unavailable."
+    ],
+    "failure_semantics": [
+      "EVIDENCE_LOSS_DURING_NORMALIZATION",
+      "PASS_FAIL_SEMANTICS_DRIFT",
+      "OBSERVATION_FABRICATED",
+      "BACKWARD_COMPATIBILITY_BREAK"
+    ],
+    "invariants": [
+      "No validation result may become more optimistic because of normalization.",
+      "NOT_RUN must never be converted into PASS or repairable FAIL merely to simplify the model.",
+      "Existing diagnostics remain available to downstream repair logic."
+    ],
+    "evidence_matrix_required": true,
+    "type": "validation_infrastructure"
+  },
+  "judge": {
+    "must_check": [
+      "Evidence is normalized without changing validation truth.",
+      "Sparse and rich evidence paths are both tested.",
+      "The resulting representation is suitable for cross-round comparison."
+    ],
+    "reject_if": [
+      "Validation behavior changes unintentionally.",
+      "Unknown observations are guessed.",
+      "The pack rewrites the validator instead of adapting existing outputs."
+    ],
+    "required": true
+  },
+  "runtime_governance": {
+    "max_coder_executions_per_pack": 4,
+    "accept_checkpoint": {"enabled": true},
+    "validation_debt_classification": {"enabled": true}
+  },
+  "execution_policy": {"max_attempts": 3}
+}
