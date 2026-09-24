@@ -1,0 +1,74 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "id": "0138.convergence-architecture-mining",
+    "title": "Convergence Architecture Audit and Mining",
+    "type": "documentation"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Time-boxed architecture audit before implementation. Reconstruct EverRun's real Planner -> Execute -> Verify/Judge -> Diagnostics -> Repair -> rerun control flow and compare only the convergence-relevant mechanisms in Foreman, LangGraph plan-and-execute/replan, OpenHands verification/event history, and SWE-agent/Aider feedback loops. The output is not a literature review: it is a REUSE / ADAPT / BUILD decision map that identifies exactly what EverRun already has, what can be borrowed, and what must be added for explicit convergence control.",
+    "goal": "Produce an implementation-ready convergence capability map within two hours, without changing production behavior.",
+    "non_goals": [
+      "Do not redesign EverRun from scratch.",
+      "Do not implement the convergence controller in this pack.",
+      "Do not perform broad framework research unrelated to validation feedback, progress, replanning, stuck detection, or rollback."
+    ],
+    "red_lines": [
+      "No production code changes.",
+      "No dependency/framework adoption decision without mapping it to a concrete missing capability.",
+      "Prefer extraction/adaptation of small mechanisms over introducing a new orchestration framework."
+    ],
+    "do_not_misread": [
+      "The key question is not single-agent versus multi-agent; it is where convergence state and next-action control live.",
+      "The audit must inspect actual code paths rather than infer architecture from names or README text."
+    ]
+  },
+  "machine_core": {
+    "goal": "Create a concise control-flow map and convergence capability matrix for EverRun, with REUSE/ADAPT/BUILD decisions and concrete source references.",
+    "files": {
+      "allow": ["docs/**"],
+      "create": ["docs/convergence/architecture-mining.md"],
+      "forbid": ["agent/**", "src/**", "tests/**"]
+    },
+    "validate": [
+      "test -s docs/convergence/architecture-mining.md"
+    ],
+    "acceptance": [
+      "Document the real EverRun decision owner after validation failure and how Planner, Judge, Diagnostics, Repair, and AgentLoop are connected.",
+      "Include a capability matrix covering evidence, persistent state, progress, frontier, replan, stuck detection, rollback, and stop/accept semantics.",
+      "For Foreman, LangGraph, OpenHands, and SWE-agent/Aider, identify only directly relevant mechanisms and mark each EverRun decision REUSE, ADAPT, or BUILD.",
+      "Identify the minimal data/control-plane changes needed for packs 0139-0142.",
+      "Record unknowns explicitly instead of filling gaps with assumptions."
+    ],
+    "failure_semantics": [
+      "ARCHITECTURE_INFERRED_NOT_TRACED",
+      "EXTERNAL_MECHANISM_NOT_ACTIONABLE",
+      "SCOPE_EXPANDED_TO_FRAMEWORK_REWRITE"
+    ],
+    "invariants": [
+      "Production behavior remains unchanged.",
+      "Every proposed borrowed mechanism has a concrete convergence capability target."
+    ],
+    "evidence_matrix_required": true,
+    "type": "documentation"
+  },
+  "judge": {
+    "must_check": [
+      "The document is implementation-ready rather than descriptive research.",
+      "EverRun's current post-failure decision path is explicitly traced.",
+      "REUSE/ADAPT/BUILD decisions are present for every convergence capability."
+    ],
+    "reject_if": [
+      "Production code changed.",
+      "The output recommends a wholesale framework migration without evidence.",
+      "The output omits source/code references for EverRun's actual control flow."
+    ],
+    "required": true
+  },
+  "runtime_governance": {
+    "max_coder_executions_per_pack": 2,
+    "accept_checkpoint": {"enabled": true},
+    "validation_debt_classification": {"enabled": false}
+  },
+  "execution_policy": {"max_attempts": 2}
+}
